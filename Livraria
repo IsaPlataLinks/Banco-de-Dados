@@ -1,0 +1,77 @@
+
+CREATE TABLE Editora (
+    edi_codigo NUMBER(5),
+    edi_nome VARCHAR2(70),
+    CONSTRAINT editora_edi_codigo_pk PRIMARY KEY (edi_codigo)
+);
+
+CREATE TABLE Assunto (
+    ass_sigla VARCHAR2(5),
+    ass_descricao VARCHAR2(200),
+    CONSTRAINT assunto_ass_sigla_pk PRIMARY KEY (ass_sigla)
+);
+
+CREATE TABLE Livro (
+    liv_codigo NUMBER(5),
+    liv_titulo VARCHAR2(70),
+    liv_preco NUMBER(7,2),
+    liv_lancamento DATE,
+    edi_codigo NUMBER(5),
+    ass_sigla VARCHAR2(5),
+    CONSTRAINT livro_liv_codigo_pk PRIMARY KEY (liv_codigo),
+    CONSTRAINT livro_edi_codigo_fk FOREIGN KEY(edi_codigo) REFERENCES Editora(edi_codigo),
+    CONSTRAINT livro_ass_sigla_fk FOREIGN KEY(ass_sigla) REFERENCES Assunto(ass_sigla)
+);
+
+CREATE TABLE Autor (
+    aut_matricula NUMBER(5),
+    aut_nome VARCHAR2(50),
+    aut_cpf VARCHAR2(15),
+    aut_data_nasc DATE,
+    aut_nacionalidade VARCHAR2(40),
+    CONSTRAINT autor_aut_matricula_pk PRIMARY KEY (aut_matricula)
+);
+
+CREATE TABLE Escreve (
+    aut_matricula NUMBER(5),
+    liv_codigo NUMBER(5),
+    CONSTRAINT escreve_pk PRIMARY KEY(aut_matricula, liv_codigo),
+    CONSTRAINT escreve_aut_matricula_fk FOREIGN KEY(aut_matricula) REFERENCES Autor(aut_matricula),
+    CONSTRAINT escreve_liv_codigo_fk FOREIGN KEY(liv_codigo) REFERENCES Livro(liv_codigo)
+);
+
+INSERT INTO Editora VALUES (1, 'Mirandela');
+INSERT INTO Editora VALUES (2, 'Editora Via Norte');
+INSERT INTO Editora VALUES (3, 'Editora Ilhas Tijucas');
+
+INSERT INTO Assunto VALUES ('BAN', 'Banco de Dados');
+INSERT INTO Assunto VALUES ('PRO', 'Programação');
+INSERT INTO Assunto VALUES ('RED', 'Redes');
+
+INSERT INTO Livro VALUES (1, 'banco de dados para web', 32.20, TO_DATE('10/01/1999','DD/MM/YYYY'), 1, 'BAN');
+INSERT INTO Livro VALUES (2, 'programando em linguagem c', 30.00, TO_DATE('01/10/1997','DD/MM/YYYY'), 1, 'PRO');
+INSERT INTO Livro VALUES (3, 'programando em linguagem c++', 115.50, TO_DATE('01/11/1998','DD/MM/YYYY'), 3, 'PRO');
+INSERT INTO Livro VALUES (4, 'banco de dados na bioinformática', 48.00, NULL, 2, 'BAN');
+INSERT INTO Livro VALUES (5, 'redes de computadores', 42.00, TO_DATE('01/09/1996','DD/MM/YYYY'), 2, 'RED');
+
+INSERT INTO Autor VALUES (1, 'Luiz', '12345678911', TO_DATE('15/05/1954','DD/MM/YYYY'), 'Brasileiro');
+INSERT INTO Autor VALUES (2, 'Hugo', '14534567895', TO_DATE('01/12/1975','DD/MM/YYYY'), 'Brasileiro');
+
+INSERT INTO Escreve VALUES (1, 1);
+INSERT INTO Escreve VALUES (1, 2);
+INSERT INTO Escreve VALUES (2, 3);
+
+SELECT liv_preco FROM Livro WHERE liv_preco > 50 AND ass_sigla = 'BAN';
+SELECT liv_preco FROM Livro WHERE liv_preco > 50 OR ass_sigla LIKE 'P%';
+SELECT * FROM Livro WHERE liv_lancamento IS NULL;
+SELECT liv_titulo FROM Livro WHERE liv_titulo LIKE 'banco%';
+SELECT * FROM Livro WHERE liv_preco BETWEEN 10 AND 60;
+SELECT * FROM Livro WHERE ass_sigla IN ('BAN', 'PRO');
+
+DELETE FROM Livro WHERE liv_titulo IN ('Banco de Dados Distribuído', 'Banco de Dados para WEB');
+DELETE FROM Livro WHERE liv_codigo >= 2 AND liv_preco > 50;
+
+UPDATE Livro SET liv_preco = 0 WHERE liv_lancamento IS NULL OR liv_preco < 5.00;
+DELETE FROM Livro WHERE ass_sigla NOT IN ('BAN', 'PRO');
+
+CREATE TABLE Livro_backup AS SELECT * FROM Livro;
