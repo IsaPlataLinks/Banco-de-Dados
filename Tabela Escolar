@@ -1,59 +1,49 @@
 CREATE TABLE Escola (
-Cd_Escola NUMBER(6) PRIMARY KEY,
-Nm_Escola VARCHAR2(50) NOT NULL,
-Ds_Endereco VARCHAR2(50) NOT NULL,
-Ds_Bairro VARCHAR2(40) NOT NULL
+    Cd_Escola NUMBER(6) PRIMARY KEY,
+    Nm_Escola VARCHAR2(50) NOT NULL,
+    Ds_Endereco VARCHAR2(50) NOT NULL,
+    Ds_Bairro VARCHAR2(40) NOT NULL
 );
 
 CREATE TABLE Grau (
-Cd_Grau NUMBER(2) PRIMARY KEY,
-Nm_Grau VARCHAR2(50) NOT NULL
+    Cd_Grau NUMBER(2) PRIMARY KEY,
+    Nm_Grau VARCHAR2(50) NOT NULL
 );
 
 CREATE TABLE Periodo (
-Cd_Periodo NUMBER(2) PRIMARY KEY,
-Nm_Periodo VARCHAR2(50) NOT NULL
+    Cd_Periodo NUMBER(2) PRIMARY KEY,
+    Nm_Periodo VARCHAR2(50) NOT NULL
 );
 
 CREATE TABLE Classe (
-Cd_Classe NUMBER(8) PRIMARY KEY,
-Nr_AnoLetivo NUMBER(4) CONSTRAINT chk_Nr_AnoLetivo CHECK (Nr_AnoLetivo > 2000) NOT NULL,
-Cd_Escola NUMBER(6),
-Cd_Grau NUMBER(2),
-Nm_Serie NUMBER(2) NOT NULL,
-Sg_Turma VARCHAR2(2) NOT NULL,
-Cd_Periodo NUMBER(2),
-
-CONSTRAINT fk_Classe_Escola FOREIGN KEY (Cd_Escola)
-REFERENCES Escola (Cd_Escola),
-
-CONSTRAINT fk_Classe_Grau FOREIGN KEY (Cd_Grau)
-REFERENCES Grau (Cd_Grau),
-
-CONSTRAINT fk_Classe_Periodo FOREIGN KEY (Cd_Periodo)
-REFERENCES Periodo (Cd_Periodo)
+    Cd_Classe NUMBER(8) PRIMARY KEY,
+    Nr_AnoLetivo NUMBER(4) NOT NULL,
+    Cd_Escola NUMBER(6),
+    Cd_Grau NUMBER(2),
+    Nm_Serie NUMBER(2) NOT NULL,  -- ou VARCHAR2(5) se aceitar "1A", "2B"
+    Sg_Turma VARCHAR2(2) NOT NULL,
+    Cd_Periodo NUMBER(2),
+    CONSTRAINT chk_Nr_AnoLetivo CHECK (Nr_AnoLetivo > 2000),
+    CONSTRAINT fk_Classe_Escola FOREIGN KEY (Cd_Escola) REFERENCES Escola(Cd_Escola),
+    CONSTRAINT fk_Classe_Grau FOREIGN KEY (Cd_Grau) REFERENCES Grau(Cd_Grau),
+    CONSTRAINT fk_Classe_Periodo FOREIGN KEY (Cd_Periodo) REFERENCES Periodo(Cd_Periodo)
 );
 
 CREATE TABLE Aluno (
-Nr_Rgm NUMBER(8) PRIMARY KEY,
-Nm_Nome VARCHAR2(40) NOT NULL,
-Nm_Pai VARCHAR2(40) NOT NULL,
-Nm_Mae VARCHAR2(40) NOT NULL,
-Dt_Nascimento DATE NOT NULL,
-ID_Sexo CHAR(1) NOT NULL
-CONSTRAINT chk_ID_Sexo CHECK (ID_Sexo IN ('M', 'F'))
+    Nr_Rgm NUMBER(8) PRIMARY KEY,
+    Nm_Nome VARCHAR2(40) NOT NULL,
+    Nm_Pai VARCHAR2(40) NOT NULL,
+    Nm_Mae VARCHAR2(40) NOT NULL,
+    Dt_Nascimento DATE NOT NULL,
+    Ds_Sexo CHAR(1) NOT NULL,  -- Mudei de ID_Sexo para Ds_Sexo (padronização)
+    CONSTRAINT chk_Ds_Sexo CHECK (Ds_Sexo IN ('M', 'F'))
 );
 
 CREATE TABLE Matricula (
-Cd_Classe NUMBER(8),
-Nr_Rgm NUMBER(8),
-Dt_Matricula DATE NOT NULL,
-
-CONSTRAINT pk_Matricula PRIMARY KEY (Cd_Classe, Nr_Rgm),
-
-CONSTRAINT fk_Matricula_Classe FOREIGN KEY (Cd_Classe)
-    REFERENCES Classe (Cd_Classe),
-
-CONSTRAINT fk_Matricula_Aluno FOREIGN KEY (Nr_Rgm)
-    REFERENCES Aluno (Nr_Rgm)
+    Cd_Classe NUMBER(8),
+    Nr_Rgm NUMBER(8),
+    Dt_Matricula DATE NOT NULL,
+    CONSTRAINT pk_Matricula PRIMARY KEY (Cd_Classe, Nr_Rgm),
+    CONSTRAINT fk_Matricula_Classe FOREIGN KEY (Cd_Classe) REFERENCES Classe(Cd_Classe),
+    CONSTRAINT fk_Matricula_Aluno FOREIGN KEY (Nr_Rgm) REFERENCES Aluno(Nr_Rgm)
 );
